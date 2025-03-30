@@ -8,4 +8,12 @@ public class Animal extends Entity {
     public Animal(String name) {
         this.name = name;
     }
+
+    @Override
+    public Animal copy() {
+        Animal copyAnimal = new Animal(name);
+        copyAnimal.id = id;
+
+        return copyAnimal;
+    }
 }
