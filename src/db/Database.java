@@ -1,14 +1,22 @@
 package db;
 
 import db.exception.EntityNotFoundException;
+import db.exception.InvalidEntityException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public final class Database {
     private static ArrayList<Entity> entities = new ArrayList<>();
     private static int id = 0;
+    private static HashMap<Integer, Validator> validators = new HashMap<>();
 
-    public static void add(Entity e) {
+    private Database() {};
+
+    public static void add(Entity e) throws InvalidEntityException {
+        Validator validator = validators.get(e.getEntityCode());
+        validator.validate(e);
+
         e.id = ++id;
         entities.add(e.copy());
     }
@@ -34,7 +42,10 @@ public final class Database {
         throw new EntityNotFoundException(id);
     }
 
-    public static void update(Entity e) {
+    public static void update(Entity e) throws InvalidEntityException {
+        Validator validator = validators.get(e.getEntityCode());
+        validator.validate(e);
+
         for (int i = 0; i < entities.size(); i++) {
             if (e.id == entities.get(i).id) {
                 entities.set(i, e.copy());
@@ -43,5 +54,12 @@ public final class Database {
         }
 
         throw new EntityNotFoundException(e.id);
+    }
+
+    public static void registerValidator(int entityCode, Validator validator) {
+        if (validators.get(entityCode) != null)
+            throw new IllegalArgumentException("This validator already exists in the HashMap.");
+
+        validators.put(entityCode, validator);
     }
 }
