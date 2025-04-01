@@ -20,10 +20,10 @@ public final class Database {
             Date now = new Date();
             trackable.setCreationDate(now);
             trackable.setLastModificationDate(now);
-        } else {
-            Validator validator = validators.get(e.getEntityCode());
-            validator.validate(e);
         }
+
+        Validator validator = validators.get(e.getEntityCode());
+        validator.validate(e);
 
         e.id = ++id;
         entities.add(e.copy());
@@ -55,10 +55,10 @@ public final class Database {
             Trackable trackable = (Trackable) e;
             Date now = new Date();
             trackable.setLastModificationDate(now);
-        } else {
-            Validator validator = validators.get(e.getEntityCode());
-            validator.validate(e);
         }
+
+        Validator validator = validators.get(e.getEntityCode());
+        validator.validate(e);
 
         for (int i = 0; i < entities.size(); i++) {
             if (e.id == entities.get(i).id) {
@@ -75,5 +75,20 @@ public final class Database {
             throw new IllegalArgumentException("This validator already exists in the HashMap.");
 
         validators.put(entityCode, validator);
+    }
+
+    public static ArrayList getEntitiesList() {
+        return entities;
+    }
+
+    public static ArrayList<Entity> getAll(int entityCode) {
+        ArrayList<Entity> list = new ArrayList<>();
+
+        for (Entity entity : entities) {
+            if (entity.getEntityCode() == entityCode)
+                list.add(entity);
+        }
+
+        return list;
     }
 }
