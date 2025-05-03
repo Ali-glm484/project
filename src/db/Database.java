@@ -77,8 +77,8 @@ public final class Database {
         validators.put(entityCode, validator);
     }
 
-    public static ArrayList getEntitiesList() {
-        return entities;
+    public static ArrayList<Entity> getEntitiesList() {
+        return new ArrayList<>(entities);
     }
 
     public static ArrayList<Entity> getAll(int entityCode) {

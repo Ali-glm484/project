@@ -5,13 +5,8 @@ import db.Entity;
 import db.exception.EntityNotFoundException;
 import db.exception.InvalidEntityException;
 import todo.entity.Step;
-import todo.entity.Task;
 
-import javax.xml.crypto.Data;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -53,10 +48,12 @@ public class StepService {
 
         if (field.equals("title")) {
             updatedStep = new Step(newValue, step.status, step.taskRef);
+
             oldValue = step.title;
 
         } else if (field.equals("taskref")) {
             updatedStep = new Step(step.title, step.status, Integer.parseInt(newValue));
+
             oldValue = Integer.toString(step.taskRef);
 
         } else {
@@ -77,15 +74,16 @@ public class StepService {
                 }
 
                 if (flagCompleted == 1)
-                    TaskService.updateTask(step.id, "status", "completed");
+                    TaskService.updateTask(step.taskRef, "status", "completed");
                 else
-                    TaskService.updateTask(step.id, "status", "in progress");
+                    TaskService.updateTask(step.taskRef, "status", "in progress");
             }
 
             oldValue = step.status.toString();
         }
 
         try {
+            updatedStep.id = id;
             Database.update(updatedStep);
 
             Date motificationDate = new Date();

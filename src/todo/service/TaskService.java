@@ -7,7 +7,6 @@ import db.exception.InvalidEntityException;
 import todo.entity.Step;
 import todo.entity.Task;
 
-import javax.xml.crypto.Data;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -36,7 +35,7 @@ public class TaskService {
 
             for (Entity entity : Database.getAll(Step.STEP_ENTITY_CODE)) {
                 if (((Step) entity).taskRef == id) {
-                    Database.delete(((Step) entity).id);
+                    Database.delete(entity.id);
                 }
             }
 
@@ -53,20 +52,29 @@ public class TaskService {
 
         if (field.equals("title")) {
             updatedTask = new Task(newValue, task.description, task.dueDate, task.status);
+
             oldValue = task.title;
 
         } else if (field.equals("description")) {
             updatedTask = new Task(task.title, newValue, task.dueDate, task.status);
+
             oldValue = task.description;
 
         } else if (field.equals("due date")) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate localDueDate = LocalDate.parse(newValue, formatter);
-            Date dueDate = Date.from(localDueDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            Date dueDate;
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate localDueDate = LocalDate.parse(newValue, formatter);
+                dueDate = Date.from(localDueDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            } catch (Exception ex) {
+                System.out.println("Invalid date format. Please use yyyy-MM-dd.");
+                return;
+            }
 
             updatedTask = new Task(task.title, task.description, dueDate, task.status);
+
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            oldValue = sdf.format(dueDate);
+            oldValue = sdf.format(task.dueDate);
 
         } else {
             if (newValue.equals("not started")) {
@@ -88,6 +96,7 @@ public class TaskService {
         }
 
         try {
+            updatedTask.id = id;
             Database.update(updatedTask);
 
             Date motificationDate = new Date();
